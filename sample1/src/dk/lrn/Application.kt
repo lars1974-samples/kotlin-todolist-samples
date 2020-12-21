@@ -1,12 +1,11 @@
 package dk.lrn
 
-import com.fasterxml.jackson.databind.SerializationFeature
+import com.google.gson.annotations.Expose
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
 import io.ktor.features.*
 import io.ktor.http.*
-import io.ktor.jackson.*
 import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
@@ -17,6 +16,9 @@ import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.dao.id.IntIdTable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import io.ktor.gson.*
+import java.text.*
+import java.time.*
 
 
 fun main() {
@@ -43,26 +45,32 @@ fun main() {
     }
 
     embeddedServer(Netty, port = 8000) {
+
+
         install(ContentNegotiation) {
-            jackson {
-                enable(SerializationFeature.INDENT_OUTPUT)
+            gson {
+                //enable(SerializationFeature.INDENT_OUTPUT)
+                setDateFormat(DateFormat.LONG)
+                setPrettyPrinting()
+                excludeFieldsWithoutExposeAnnotation()
             }
         }
         routing {
             get ("/") {
-
-                    call.respond(HttpStatusCode.OK, mapOf(Pair("count", getUsers())))
+                    //convert to DTOs
+                    val u = getUsers().map { UserDto(it.id.value, it.name, it.age) }
+                    call.respond(HttpStatusCode.OK, u)
             }
         }
     }.start(wait = true)
 }
 
 
-fun getUsers(): String {
-    var users: String? = null
+fun getUsers(): List<User> {
+    var users: List<User>? = null
+
     transaction {
-        users = User.all().first().name
-        println(users)
+        users = User.all().toList();
     }
     return users!!
 }
@@ -76,15 +84,22 @@ class User(id: EntityID<Int>) : IntEntity(id) {
     constructor(id: EntityID<Int>, name: String): this(id){
         this.name = name
     }
+
+
     companion object : IntEntityClass<User>(Users)
 
     var name by Users.name
     var age by Users.age
 
+
     override fun toString(): String {
         return "name $name age: $age"
     }
 }
+
+data class UserDto(
+    @Expose val id: Int, @Expose val name : String, @Expose val age:Int)
+
 
 private fun hikari(): HikariDataSource {
     val config = HikariConfig()
