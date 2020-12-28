@@ -23,6 +23,7 @@ fun main() {
 
     embeddedServer(Netty, port = 8000) {
         wishModule()
+        webModule()
         install(ContentNegotiation) {
             gson {
                 //enable(SerializationFeature.INDENT_OUTPUT)

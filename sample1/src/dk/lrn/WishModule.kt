@@ -15,23 +15,41 @@ import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.wishModule(){
     routing {
-        get ("/") {
-            //convert to DTOs
-
-            val u0 = getUsers();
-            val u = u0.map {
-                val wi = getWishItemsByUser(it)
-                wi.forEach{println(it.name)}
-                //val widtos = wi.map { WishItemDto(it.id.value, it.name, it.price, it.url, it.shop) }.toList()
-                val widtos = wi.map {WishItemDto(1, it.name, it.price, it.url, it.shop) }.toList()
-                //val widtos = SizedCollection(listOf<WishItemDto>(WishItemDto(1, "p", 100, "f", "f")))
-                val udto = UserDto(it.id.value, it.name, it.age, widtos)
-                udto
-            }.toList()
-            call.respond(HttpStatusCode.OK, u)
+        route("/api") {
+            get() {
+                //convert to DTOs
+                val u0 = getUsers();
+                val u = u0.map {
+                    val wi = getWishItemsByUser(it)
+                    //val widtos = wi.map { WishItemDto(it.id.value, it.name, it.price, it.url, it.shop) }.toList()
+                    val widtos = wi.map { WishItemDto(1, it.name, it.price, it.url, it.shop) }.toList()
+                    //val widtos = SizedCollection(listOf<WishItemDto>(WishItemDto(1, "p", 100, "f", "f")))
+                    val udto = UserDto(it.id.value, it.name, it.age, widtos)
+                    udto
+                }.toList()
+                call.respond(HttpStatusCode.OK, u)
+            }
         }
     }
 }
+
+
+fun getUserDtoWithWishItemDtos(id:Int):UserDto? {
+    val user = getUser(id);
+    if (user==null){
+        return null
+    }
+    val wishItemsByUser = getWishItemsByUser(user);
+    val wiList = wishItemsByUser.mapNotNull { toWishItemDto(it) }.toList()
+    return toUserDto(user, wiList)
+}
+
+fun toWishItemDto(wi:WishItem):WishItemDto =
+    WishItemDto(id=wi.id.value,name = wi.name, price = wi.price, url = wi.url, shop = wi.shop)
+
+fun toUserDto(user:User, wiList:List<WishItemDto>):UserDto =
+    UserDto(id=user.id.value,name = user.name, age = user.age, items = wiList)
+
 
 fun getUsers(): List<User> {
     var users: List<User>? = null
@@ -40,6 +58,15 @@ fun getUsers(): List<User> {
         users = User.all().toList();
     }
     return users!!
+}
+
+fun getUser(id:Int): User? {
+    var user: User? = null
+
+    transaction {
+        user = User.findById(id)
+    }
+    return user
 }
 
 fun getWishItemsByUser(user:User): List<WishItem> {
@@ -84,7 +111,6 @@ object WishItems : IntIdTable() {
     val url = varchar("url", 80)
     val shop = varchar("shop", 30)
     val userId = integer("user_id")
-        .uniqueIndex()
         .references(Users.id)
 }
 

@@ -47,10 +47,26 @@ fun initDatabase() {
         }
 
         WishItems.insert {
-            it[name] = "Ford Focus "
-            it[price] = 100000
+            it[name] = "Ford Focus"
+            it[price] = 5000
             it[url] = "www.ford.com"
-            it[shop] = "Ford, Hillerød"
+            it[shop] = "Ford inc"
+            it[WishItems.userId] = id1.value
+        }
+
+        WishItems.insert {
+            it[name] = "Ford Fiesta"
+            it[price] = 1000
+            it[url] = "www.ford.com"
+            it[shop] = "Ford inc"
+            it[WishItems.userId] = id2.value
+        }
+
+        WishItems.insert {
+            it[name] = "Hoverboard"
+            it[price] = 5000
+            it[url] = "www.hover.com"
+            it[shop] = "Hover inc"
             it[WishItems.userId] = id2.value
         }
     }
