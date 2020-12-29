@@ -30,6 +30,13 @@ fun Application.wishModule(){
                 call.respond(HttpStatusCode.OK, u)
             }
         }
+        route("/api2") {
+            get() {
+                val u = UserDao().list()
+                println(u)
+                call.respond(HttpStatusCode.OK, u)
+            }
+        }
     }
 }
 
@@ -85,25 +92,6 @@ private  fun toWishItem(row: ResultRow): WishItem  {
     return wi
 }
 
-object Users : IntIdTable() {
-    val name = varchar("name", 50).index()
-    val age = integer("age")
-}
-
-class User(id: EntityID<Int>) : IntEntity(id) {
-    constructor(id: EntityID<Int>, name: String): this(id){
-        this.name = name
-    }
-    companion object : IntEntityClass<User>(Users)
-
-    var name by Users.name
-    var age by Users.age
-    val wishItems by WishItem referrersOn WishItems.userId
-
-    override fun toString(): String {
-        return "name $name age: $age"
-    }
-}
 
 object WishItems : IntIdTable() {
     val name = varchar("item", 50).index()
@@ -119,10 +107,11 @@ class WishItem(id: EntityID<Int>, @Expose var name:String, var price:Int, var ur
     override fun toString(): String {
         return "WishItem(name='$name', price=$price, url='$url', shop='$shop')"
     }
+    fun toModel() : WishItemDto {
+        return WishItemDto(id.value, name, price, url, shop)
+    }
 }
 
-data class UserDto(
-    @Expose val id: Int, @Expose val name : String, @Expose val age:Int, @Expose val items : List<WishItemDto>)
 
 data class WishItemDto(
     @Expose val id: Int, @Expose val name: String, @Expose val price:Int, @Expose val url:String, @Expose val shop:String)
