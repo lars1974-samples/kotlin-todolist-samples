@@ -45,17 +45,52 @@ fun initDatabase() {
         addLogger(StdOutSqlLogger)
 
         SchemaUtils.create(MyAppUserTable)
+        SchemaUtils.create(ToDoItemTable)
 
         val id1 = MyAppUserTable.insert {
             it[email] = "J@kob"
             it[realName] = "jakob"
         } get MyAppUserTable.id
 
+        val id2 = ToDoItemTable.insert {
+            it[item] = "Købe ind"
+            it[priority] = 1
+            it[user] = id1
+        } get ToDoItemTable.id
+
+        val id3 = ToDoItemTable.insert {
+            it[item] = "Købe ind igen"
+            it[priority] = 2
+            it[user] = id1
+        } get ToDoItemTable.id
+
+        val dao = MyAppUserDAO.new {
+            email = "jakob@lb.dk"
+            realName = "peter jensen"
+
+//            items = SizedCollection(listOf<ToDoItemDAO>(ToDoItemDAO.new {
+//                    item="indkøb"
+//                    priority=1
+//                }))
+        }
+
+        val item1 = ToDoItemDAO.new {
+                    item="indkøb"
+                    priority=1
+                    user = dao
+                }
+
+        val item2 = ToDoItemDAO.new {
+            item="indkøb2"
+            priority=12
+            user = dao
+        }
     }
 }
 
 // Data model - data classes for input and output formats
-data class MyAppUser(@Expose val email: String, @Expose val realName: String)
+data class MyAppUser(@Expose val email: String, @Expose val realName: String, @Expose val items : List<ToDoItem>)
+data class ToDoItem(@Expose val item: String, @Expose val priority: Int)
 
 data class CreateMyAppUserCommand(@Expose val email: String, @Expose val realName: String)
 
@@ -85,7 +120,7 @@ class DatastoreConnection(private val dataSource: DataSource) {
 
     suspend fun <T> query(block: () -> T): T = withContext(Dispatchers.IO) {
         transaction(database) {
-            block()
+             block()
         }
     }
 }
@@ -94,6 +129,7 @@ class DatastoreConnection(private val dataSource: DataSource) {
 internal object MyAppUserTable : LongIdTable("my_app_user_table") {
     val email = varchar("user_email", 255).uniqueIndex()
     val realName = varchar("real_name", 255)
+
 }
 
 internal class MyAppUserDAO(id: EntityID<Long>) : LongEntity(id) {
@@ -101,11 +137,30 @@ internal class MyAppUserDAO(id: EntityID<Long>) : LongEntity(id) {
 
     var email by MyAppUserTable.email
     var realName by MyAppUserTable.realName
-
+    val items by ToDoItemDAO referrersOn ToDoItemTable.user
     fun toModel(): MyAppUser {
-        return MyAppUser(email, realName)
+        return MyAppUser(email, realName, items.map { it.toModel()})
     }
 }
+
+internal object ToDoItemTable : LongIdTable("my_to_do_item_table") {
+    val item = varchar("item", 255)
+    val priority = integer("priority")
+    val user = reference("user", MyAppUserTable)
+}
+
+internal class ToDoItemDAO(id: EntityID<Long>) : LongEntity(id) {
+    companion object : LongEntityClass<ToDoItemDAO>(ToDoItemTable)
+
+    var item by ToDoItemTable.item
+    var priority by ToDoItemTable.priority
+    var user by MyAppUserDAO referencedOn ToDoItemTable.user
+    fun toModel(): ToDoItem {
+        return ToDoItem(item, priority)
+    }
+}
+
+
 
 // Service implementation for datastore of choice
 internal class MyAppUserServiceImpl(private val dbc: DatastoreConnection) : MyAppUserService {
