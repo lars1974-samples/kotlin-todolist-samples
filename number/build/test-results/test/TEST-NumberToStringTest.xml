@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="NumberToStringTest" tests="1" skipped="0" failures="0" errors="0" timestamp="2020-12-23T20:47:11" hostname="LARS-ASUS" time="0.06">
-  <properties/>
-  <testcase name="test" classname="NumberToStringTest" time="0.06"/>
-  <system-out><![CDATA[TWENTY THREE CENTS
-]]></system-out>
-  <system-err><![CDATA[]]></system-err>
-</testsuite>

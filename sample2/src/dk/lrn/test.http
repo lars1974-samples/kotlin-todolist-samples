@@ -1,0 +1,12 @@
+GET http://localhost:8000/api/myUsers
+
+GET http://localhost:8000/api/myUsers
+
+###
+POST http://www.google.dk
+Accept: application/json
+
+{ "test" : "test" }
+
+###
+
