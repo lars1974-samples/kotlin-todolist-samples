@@ -1,5 +1,6 @@
 package dk.lrn.wishlist.springboot
 
+import dk.lrn.wishlist.springboot.boundary.ErrorMessage
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -9,16 +10,22 @@ import org.springframework.security.oauth2.jwt.Jwt
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType
 import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.core.convert.converter.Converter
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.http.HttpStatus
+
+import org.springframework.http.ResponseEntity
+
+import org.springframework.web.bind.annotation.ControllerAdvice
+import org.springframework.web.bind.annotation.ExceptionHandler
+import org.springframework.web.bind.annotation.ResponseStatus
+
 
 @SpringBootApplication
 class WishlistSpringbootApplication
@@ -52,12 +59,21 @@ class BasicConfiguration : WebSecurityConfigurerAdapter() {
 }
 
 class JWTConverter(val admins: List<String>) : Converter<Jwt, Collection<GrantedAuthority>> {
-    override fun convert(jwt: Jwt): Collection<GrantedAuthority>? {
+    override fun convert(jwt: Jwt): Collection<GrantedAuthority> {
         val access = jwt.claims["realm_access"] as Map<*, *>
         val roles = access["roles"] as List<*>
         val list = roles.map { SimpleGrantedAuthority("ROLE_$it") }.toMutableList()
         if (admins.contains(jwt.claims["email"])) list.add(SimpleGrantedAuthority("ROLE_admins"))
         list.add(SimpleGrantedAuthority("ROLE_users"))
         return list
+    }
+}
+
+@ControllerAdvice
+class GeneralExceptionHandler {
+    @ExceptionHandler(EmptyResultDataAccessException::class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    protected fun handleException(ex: EmptyResultDataAccessException): ResponseEntity<ErrorMessage> {
+        return ResponseEntity<ErrorMessage>(ErrorMessage("element not found in database"),HttpStatus.valueOf(404))
     }
 }

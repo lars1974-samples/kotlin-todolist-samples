@@ -11,5 +11,7 @@ data class NewTodoList(val name: String)
 
 data class TodoList(val id: Long, val name: String, var items: MutableList<TodoItem>)
 
+data class ErrorMessage(val message: String)
+
 
 
