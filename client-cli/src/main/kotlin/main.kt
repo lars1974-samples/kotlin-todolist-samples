@@ -7,6 +7,7 @@ suspend fun main(args: Array<String>) {
             "login" -> parseLogin(args)
             "lists" -> parsesLists(args)
             "list" -> parseList(args)
+            "p" -> parseMe(args)
         }
     }
 }
@@ -17,6 +18,12 @@ suspend fun parseLogin(args: Array<String>){
         return
     }
     File("token.txt").writeText(ConnectionClient().login(args[1], args[2]))
+}
+
+suspend fun parseMe(args: Array<String>){
+
+    println(getClient().base())
+
 }
 
 suspend fun parseList(args: Array<String>){

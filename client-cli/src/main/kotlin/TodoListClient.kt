@@ -6,6 +6,13 @@ import io.ktor.client.statement.*
 import io.ktor.http.*
 
 class TodoListClient(val baseUrl: String, val token: String) {
+
+    suspend fun base(): String {
+        return getClient().get("$baseUrl") {
+            header("Authorization", "Bearer $token")
+        }
+    }
+
     suspend fun listById(id: Long): TodoList {
         return getClient().get("$baseUrl/lists/${id}") {
             header("Authorization", "Bearer $token")
