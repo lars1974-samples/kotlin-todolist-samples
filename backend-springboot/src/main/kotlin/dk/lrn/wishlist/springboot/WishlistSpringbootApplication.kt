@@ -34,6 +34,7 @@ fun main(args: Array<String>) {
     runApplication<WishlistSpringbootApplication>(*args)
 }
 
+@Suppress("unused")
 @OpenAPIDefinition(info = Info(title = "My API", version = "v1"))
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 class OpenApi30Config

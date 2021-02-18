@@ -1,1 +1,1 @@
-rootProject.name = "wishlist-springboot"
+rootProject.name = "kotlin-backend-springboot"
