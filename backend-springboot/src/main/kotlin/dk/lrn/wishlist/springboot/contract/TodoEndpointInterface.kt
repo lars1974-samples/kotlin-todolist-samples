@@ -13,6 +13,12 @@ interface TodoEndpointInterface {
     @GetMapping("/lists/{listId}")
     fun getList(@PathVariable("listId") listId: Long): TodoList
 
+    @DeleteMapping("/users/{userId}")
+    fun deleteUser(@PathVariable("userId") userId: Long)
+
+    @DeleteMapping("/lists/{listId}")
+    fun deleteList(@PathVariable("listId") listId: Long)
+
     @PostMapping("/lists")
     fun addList(@RequestBody newTodoList: NewTodoList)
 

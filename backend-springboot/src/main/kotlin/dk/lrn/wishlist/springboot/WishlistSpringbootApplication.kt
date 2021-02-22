@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.OpenAPIDefinition
 import io.swagger.v3.oas.annotations.info.Info
 import io.swagger.v3.oas.annotations.security.SecurityScheme
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Profile
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.core.convert.converter.Converter
 import org.springframework.dao.EmptyResultDataAccessException
@@ -25,6 +26,8 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.ResponseStatus
+import org.springframework.security.config.annotation.web.builders.WebSecurity
+import java.lang.Exception
 
 
 @SpringBootApplication
@@ -38,6 +41,8 @@ fun main(args: Array<String>) {
 @OpenAPIDefinition(info = Info(title = "My API", version = "v1"))
 @SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 class OpenApi30Config
+
+
 
 @EnableWebSecurity
 class BasicConfiguration : WebSecurityConfigurerAdapter() {
