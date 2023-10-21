@@ -66,6 +66,7 @@ class BasicConfiguration : WebSecurityConfigurerAdapter() {
 
 class JWTConverter(val admins: List<String>) : Converter<Jwt, Collection<GrantedAuthority>> {
     override fun convert(jwt: Jwt): Collection<GrantedAuthority> {
+
         val access = jwt.claims["realm_access"] as Map<*, *>
         val roles = access["roles"] as List<*>
         val list = roles.map { SimpleGrantedAuthority("ROLE_$it") }.toMutableList()

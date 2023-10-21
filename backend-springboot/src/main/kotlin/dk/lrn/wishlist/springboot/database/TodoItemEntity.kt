@@ -1,9 +1,6 @@
-package dk.lrn.wishlist.springboot
+package dk.lrn.wishlist.springboot.database
 
-import org.springframework.data.repository.CrudRepository
-import org.springframework.stereotype.Repository
 import javax.persistence.*
-
 
 @Entity
 data class TodoItemEntity(

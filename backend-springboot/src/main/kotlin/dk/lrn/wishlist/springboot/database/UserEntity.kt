@@ -1,6 +1,5 @@
 package dk.lrn.wishlist.springboot.database
 
-import dk.lrn.wishlist.springboot.TodoItemEntity
 import javax.persistence.*
 
 @Entity

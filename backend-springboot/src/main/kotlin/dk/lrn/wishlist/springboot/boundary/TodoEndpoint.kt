@@ -1,7 +1,7 @@
 package dk.lrn.wishlist.springboot.boundary
 
 import dk.lrn.wishlist.springboot.database.TodoListEntity
-import dk.lrn.wishlist.springboot.TodoItemEntity
+import dk.lrn.wishlist.springboot.database.TodoItemEntity
 import dk.lrn.wishlist.springboot.UserService
 import dk.lrn.wishlist.springboot.contract.TodoEndpointInterface
 import dk.lrn.wishlist.springboot.database.TodoItemRepository

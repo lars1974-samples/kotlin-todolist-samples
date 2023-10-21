@@ -1,9 +1,6 @@
 package dk.lrn.wishlist.springboot
 
-import dk.lrn.wishlist.springboot.database.TodoListEntity
-import dk.lrn.wishlist.springboot.database.TodoListRepository
-import dk.lrn.wishlist.springboot.database.UserEntity
-import dk.lrn.wishlist.springboot.database.UserRepository
+import dk.lrn.wishlist.springboot.database.*
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.oauth2.jwt.Jwt
